@@ -1,0 +1,15 @@
+---
+title: "Assignment_1"
+author: "Nadine Snyder"
+date: "2023-02-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Why am I taking 262
+I am taking 262 because I am interested in taking the environmental modeling class in the spring. I am currently taking energy demand analysis and am buildig energy models on excel. I am really enjoying this and would love to learn how to build more complex models using R. 
+### Data Science Background
+I do not have a lot of experience coding. All of my experience comes from 206. I have used other systems such as GIS, Excel, and Google Earth Engine to analyze and solve environmental problems. I look forward to growing my coding skills in this course. 
