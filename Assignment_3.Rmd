@@ -1,0 +1,96 @@
+---
+title: "Assignment 3"
+author: "Nadine Snyder"
+date: "2023-03-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(purrr)
+library(ggpubr)
+```
+
+
+```{r sampling2, eval=TRUE, echo=TRUE}
+possible_cars = data.frame(name = c("A","B","C", "D"),mass=c(10000,65000,38000,5000), area = c(22,30,22,10))
+speed_base = 100 * 0.28
+possible_cars$power = pb(V=speed_base, A = possible_cars$area, m=possible_cars$mass)
+
+head(possible_cars)
+
+
+
+
+```
+
+```{r withforloop}
+# estimate average power use given each car using a sample size of 200 
+possible_cars
+nsample = 200
+# convert the mean speed of 80 km/hr into m/s
+mean_speed = log(80*0.277)
+speeds = rlnorm(mean=mean_speed, sd=0.1*mean_speed, nsample)
+summary(speeds)
+# plot the speeds 
+plot(density(speeds), ylab="Distribution of Speeds in (m/s)")
+
+
+```
+```{r withforloop}
+# create a data frame to store results 
+powerall1 = as.data.frame(matrix(nrow=length(speeds), ncol=nrow(possible_cars)))
+head(powerall1)
+nrow(possible_cars)
+# for loops use an index - in this case "i" but you could use anything - it repeats
+# anything between the {} for each values of i between 1 and nrow(possible_car) (which is 4 in our case)
+for (i in 1:nrow(possible_cars)) {
+  powerall1[,i] = pb(A=possible_cars$area[i], m=possible_cars$mass[i], V=speeds)
+}
+head(powerall1)
+colnames(powerall1)=possible_cars$name
+# for plotting sometimes its useful to turn columns in to rows
+powerallr1 = powerall1 %>% pivot_longer(cols=everything(), names_to="car", values_to="power")
+head(powerallr1)
+#create box plots 
+method1_plot = ggplot(powerallr1, aes(car,power, fill=car))+geom_boxplot()+ggtitle("For Loop")
+method1_plot
+```
+
+```{r with pmap}
+# estimate average power use given each car using a sample size of 200 
+possible_cars
+nsample = 200
+# convert the mean speed of 80 km/hr into m/s
+mean_speed = log(80*0.277)
+speeds = rlnorm(mean=mean_speed, sd=0.1*mean_speed, nsample)
+summary(speeds)
+# plot the speeds 
+plot(density(speeds), ylab="Distribution of Speeds in (m/s)")
+# create a data frame to store results 
+powerall2 = pmap(list(A = possible_cars$area, m=possible_cars$mass), pb, V=speeds)
+powerall2 = as.data.frame(powerall2, col.names=possible_cars$name)
+# use mapply to apply family of functions to the data
+powerall2b = mapply(FUN=pb, A = possible_cars$area, m=possible_cars$mass, MoreArgs = list(V=speeds) )
+#create column names and turn columns into rows
+colnames(powerall2b)=possible_cars$name
+head(powerall2b)
+head(powerall2)
+powerallr2 = powerall2 %>% pivot_longer(cols=everything(), names_to="car", values_to="power")
+head(powerallr2)
+#create box plot for pmap data
+method2_plot = ggplot(powerallr2, aes(car,power, fill=car))+geom_boxplot()+ggtitle("pmap")
+method2_plot
+# compare the forloop and pmap box plots
+ggarrange(method1_plot, method2_plot)
+head(powerallr2)
+head(powerallr1)
+# compare forloop and pmap mean and maximums 
+powerall1 %>% map(mean)
+powerall2 %>% map(mean)
+powerall1 %>% map(quantile, probs=1)
+powerall2 %>% map(quantile, probs=1)
+
+```
+
