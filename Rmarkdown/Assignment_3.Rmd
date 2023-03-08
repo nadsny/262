@@ -14,6 +14,7 @@ library(ggpubr)
 
 
 ```{r sampling2, eval=TRUE, echo=TRUE}
+source("../../R/pb.R")
 possible_cars = data.frame(name = c("A","B","C", "D"),mass=c(10000,65000,38000,5000), area = c(22,30,22,10))
 speed_base = 100 * 0.28
 possible_cars$power = pb(V=speed_base, A = possible_cars$area, m=possible_cars$mass)
