@@ -17,7 +17,7 @@ library(knitr)
 
 ```{r}
 #upload text file into r
-fish_data<-read.delim(file.choose("fish.txt"))
+fish_data<-read.table("../data/fish.txt")
 ```
 
 ```{r}
