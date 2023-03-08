@@ -1,0 +1,27 @@
+---
+title: "Assignment4"
+author: "Nadine Snyder"
+date: "2023-03-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor)
+library(here)
+library(ggpubr)
+library(broom)
+library(knitr)
+```
+
+```{r}
+fish_data<-read.delim(file.choose("fish.txt"))
+```
+
+```{r}
+source("../../R/fish_info.R")
+fish_return <-fish_info("fish_data")
+data.frame(fish_return)
+```
+
