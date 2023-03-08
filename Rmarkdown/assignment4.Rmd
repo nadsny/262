@@ -16,12 +16,15 @@ library(knitr)
 ```
 
 ```{r}
+#upload text file into r
 fish_data<-read.delim(file.choose("fish.txt"))
 ```
 
 ```{r}
-source("../../R/fish_info.R")
+source("../R/fish_info.R")
+#generate common, rare, and total fish using fish info fuction
 fish_return <-fish_info("fish_data")
+#format function in a data frame
 data.frame(fish_return)
 ```
 
