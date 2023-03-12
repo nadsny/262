@@ -1,13 +1,93 @@
 ---
 title: "Assignment 5"
-author: "Nadine Snyder & Hannah Irish"
+author: "Nadine Snyder, Adele Colwell, & Hannah Irish"
 date: "2023-03-08"
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+source(here::here("R/compute_wind_power.R")) ## bringing in function
 ```
 
 
 ### Testing!!! 
+
+```{r}
+##testing function:
+compute_wind_power(wind_speed = 30, blade_length = 50)
+#compute_wind_power(wind_speed = 20, blade_length=0)
+compute_wind_power(wind_speed = 0, blade_length = 30)
+#compute_wind_power(wind_speed=-10, blade_length=40)
+
+##checked with variety of inputs to make sure it catches the warnings/stops
+```
+
+### Generate data for the function
+```{r}
+speeds = runif(100, min=1, max=25) ## 100 wind speeds between 1 and 25
+
+turbines = data.frame(ID = c("A", "B", "C", "D"),blade_length=c(52,70,40,45))
+```
+
+### Set up data frame to hold data
+```{r}
+
+##making vectors for all the outputs we'll have:
+loop_pow_vec <- c()
+loop_KE_vec <- c()
+map_pow_vec <- c()
+map_KE_vec <- c()
+
+# ## making data frame for the vectors:
+# results_df <- data.frame(loop_pow_vec, loop_KE_vec, map_pow_vec, map_KE_vec)
+# 
+# resulst_df %>% colnames(loop_power, loop_KE, map_power, map_KE)
+
+power_ke_loop <- as.data.frame(matrix(nrow=length(speeds),ncol=nrow(turbines))) 
+
+```
+
+### Looping
+```{r}
+
+ start = 1
+  the_next = 2
+for (i in 1:nrow(turbines)){
+ 
+  power_ke_loop[,start:the_next]=compute_wind_power(wind_speed = speeds, blade_length = turbines$blade_length[i])
+  
+ 
+  
+  start=start+2
+  the_next=the_next+2
+  
+}
+
+  
+ powers <- power_ke_loop %>%
+   select(2,4,6,8)
+ 
+ colnames(powers) <- turbines$ID 
+ 
+ powers_tidy <- pivot_longer(powers, cols = (1:4), names_to = "Turbine", values_to = "Power")
+ 
+ KE <- power_ke_loop %>%
+   select(1,3,5,7)
+ 
+ colnames(KE) <- turbines$ID 
+ 
+ KE_tidy <- pivot_longer(KE, cols = (1:4), names_to = "Turbine", values_to = "Kinetic_Energy")
+ 
+ loop_output <- cbind(KE_tidy, powers_tidy) %>%
+   select(1,2,4)
+ 
+ 
+ 
+
+```
+
