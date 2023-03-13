@@ -12,12 +12,13 @@
 
 compute_wind_power <- function (blade_length, wind_speed, CP=0.45, pi= 22/7, mass=2360) {
   
-  ## if blade_length <= 0 or wind_speed is <0, stops the function as it's illogical
+  ## stop the function if blade length is 0 or negative:
   if(blade_length <= 0){
     stop("Please check your Blade Length and Try Again")
   }
   
-  wind = ifelse(wind_speed < 0, stop("Please check your Wind Speed and Try Again"), wind_speed)
+  ## stop the function if wind speed is negative, otherwise, proceed
+  wind = ifelse(wind_speed < 0, stop("Please check your Wind Speed and Try Again"), wind_speed) 
   
   
   power = 0.5 * CP * pi * (blade_length)^2 * (wind)^3 ##calculate power
@@ -25,7 +26,7 @@ compute_wind_power <- function (blade_length, wind_speed, CP=0.45, pi= 22/7, mas
   inertia <- ((blade_length^2)*mass) ##caculate moment of inertia
   
   
-   KE <- (0.5*inertia*wind^2) ## calculate kinetic energy
+  KE <- (0.5*inertia*wind^2) ## calculate kinetic energy
   
   results <- c(KE, power) ## make a vector containing KE and power
   
