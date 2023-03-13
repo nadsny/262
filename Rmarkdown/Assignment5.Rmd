@@ -1,13 +1,112 @@
 ---
 title: "Assignment 5"
-author: "Nadine Snyder & Hannah Irish"
+author: "Nadine Snyder, Adele Colwell, & Hannah Irish"
 date: "2023-03-08"
-output: html_document
+output: 
+  html_document:
+    code_folding: hide
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+source(here::here("R/compute_wind_power.R")) ## bringing in function
 ```
 
 
 ### Testing!!! 
+
+```{r}
+##testing function:
+compute_wind_power(wind_speed = 30, blade_length = 50)
+#compute_wind_power(wind_speed = 20, blade_length=0)
+compute_wind_power(wind_speed = 0, blade_length = 30)
+#compute_wind_power(wind_speed=-10, blade_length=40)
+
+##checked with variety of inputs to make sure it catches the warnings/stops
+```
+
+### Generate data for the function
+```{r}
+speeds = runif(100, min=1, max=25) ## 100 wind speeds between 1 and 25
+
+turbines = data.frame(ID = c("A", "B", "C", "D"),blade_length=c(52,70,40,45)) ## Four turbines with different blade lengths
+```
+
+### Using a For Loop
+```{r}
+
+## making a data frame to store loop output
+power_ke_loop <- as.data.frame(matrix(nrow=length(speeds),ncol=nrow(turbines)))  
+
+##initializing numbers to index the column to store
+ start = 1
+  the_next = 2
+  
+for (i in 1:nrow(turbines)){ ##for the # of turbines
+ 
+  power_ke_loop[,start:the_next]=compute_wind_power(wind_speed = speeds, blade_length = turbines$blade_length[i]) ##store the KE as the first column and the power as the second
+  
+ 
+  
+  start=start+2 ##move forward 2 columns to get fresh columns for each KE and power by adding 2 to "start" and "next"
+  the_next=the_next+2
+  
+}
+
+  
+  ## separate out only the powers
+ powers <- power_ke_loop %>%
+   select(2,4,6,8)
+ 
+ ## name by turbine
+ colnames(powers) <- turbines$ID 
+ 
+ ##make tidy 
+ powers_tidy <- pivot_longer(powers, cols = (1:4), names_to = "Turbine", values_to = "Power")
+ 
+ ##separate out only the KE
+ KE <- power_ke_loop %>%
+   select(1,3,5,7)
+ 
+ ## name by turbine
+ colnames(KE) <- turbines$ID 
+ 
+ ## make tidy
+ KE_tidy <- pivot_longer(KE, cols = (1:4), names_to = "Turbine", values_to = "Kinetic_Energy")
+ 
+ ##combine data frames but deselect second column of names of turbine
+ loop_output <- cbind(KE_tidy, powers_tidy) %>%
+   select(-3)
+ 
+
+
+```
+
+## Using urrr::pmap
+```{r}
+##use purrr::pmap to make list of output
+power_ke_map <- pmap(list(blade_length=turbines$blade_length),compute_wind_power, wind_speed=speeds)
+
+##make into data frame
+power_ke_map = as.data.frame(power_ke_map, col.names=turbines$ID)
+
+##select only KE (first half of rows)
+KE_map <- power_ke_map[1:100,]
+## select only power (second half of rows)
+power_map <- power_ke_map[101:200,]
+
+##make each tidy, add turbine name, label type of data
+KE_map_tidy <- pivot_longer(KE_map, cols=(1:4), names_to = "Turbine", values_to = "Kinetic Energy")
+
+power_map_tidy <- pivot_longer(power_map, names_to = "Turbine", cols= (1:4),  values_to = "Power")
+
+##combine data frames but deselect second column of names of turbine
+map_output <- cbind(KE_map_tidy, power_map_tidy) %>%
+   select(-3)
+
+
+## now map_output has KE and power done by purrr::map and loop_output has the same calculated by the for loop
+```
+
