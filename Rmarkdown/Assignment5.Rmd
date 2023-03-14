@@ -10,6 +10,8 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(testthat)
+library(devtools)
 
 source(here::here("R/compute_wind_power.R")) ## bringing in function
 ```
@@ -24,8 +26,10 @@ compute_wind_power(wind_speed = 30, blade_length = 50)
 compute_wind_power(wind_speed = 0, blade_length = 30)
 #compute_wind_power(wind_speed=-10, blade_length=40)
 
+
 ##checked with variety of inputs to make sure it catches the warnings/stops
 ```
+
 
 ### Generate data for the function
 ```{r}
@@ -109,4 +113,17 @@ map_output <- cbind(KE_map_tidy, power_map_tidy) %>%
 
 ## now map_output has KE and power done by purrr::map and loop_output has the same calculated by the for loop
 ```
+
+
+```{r}
+### graphs
+ p2 <-ggplot(loop_output, aes(x=Kinetic_Energy, y=Power)) +
+  geom_line() + ylab("Power (W)") + xlab("Kinetic Energy (J)") + ggtitle("Power vs. Kinetic Energy")
+
+p2
+
+
+# use ggplot to edit the axes, 
+```
+
 
